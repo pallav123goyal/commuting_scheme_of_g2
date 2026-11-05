@@ -9,7 +9,7 @@ c = {13641,22825,27432,6173,21845,18827,20908,8404,5290,9258,14370,10545,3220,26
 
 R = kk[u_1..u_12];
 x = {sub(c_(14),R),u_1,u_2,u_3,sub(c_(15),R),u_4,u_5,u_6,u_7,u_8,u_9,u_10,u_11,u_12};
-y = apply(inverseSigma,i -> sub(c#i,R)-x_i);
+y = apply(inverseSigma,i -> x_i-sub(c#i,R));
 
 w = (i,j) -> x_(i-1)*y_(j-1)-x_(j-1)*y_(i-1);
 delta = 192*w(1,2);

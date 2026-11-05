@@ -1,57 +1,6 @@
-#!/usr/bin/env python3
-"""
-commuting_degrees.py
-
-Computes deg C(g) for every simple Lie algebra g in which the commuting scheme of a Borel
-subalgebra is irreducible (Goddard--Goodwin, Thm 1.3), i.e. for
-
-    A_l (l <= 15),  B_l (l <= 6),  C_l (l <= 6),  D_l (l <= 7),  E_6,  G_2,
-
-from the root-theoretic degree formula
-
-    deg C(g) = (1/|W|) * sum_{w in W} w( P_N / prod_{gamma > 0} (-gamma) ),
-    P = prod_{gamma > 0} (1 - gamma)^2 (2 + gamma) = prod_{gamma > 0} (2 - 3 gamma + gamma^3),
-    P_N = homogeneous component of degree N = |Phi^+|.
-
-Two evaluation methods are used, both exact (integer arithmetic modulo primes near 2^30 with
-reconstruction by the Chinese remainder theorem; the reconstruction is required to be stable
-under dropping the last prime).
-
-(1) Orbit sum, any type.  The symmetrised function is constant, so it is evaluated at lambda = 2 rho:
-        deg C(g) = (-1)^N / (|W| D) * sum_{mu in W.lambda} sgn(mu) P_N(mu),
-    D = prod_{gamma>0} <gamma, lambda>, sgn(mu) = (-1)^{#{gamma > 0 : <gamma, mu> < 0}},
-    P_N(mu) = [t^N] prod_{gamma > 0} (2 - 3 a t + a^3 t^3), a = <gamma, mu>.
-    Cost proportional to |W|; used for types B, C, D, E, F, G and as a cross-check in type A.
-
-(2) Subset dynamic programme, type A only.  For g = sl_n and x = (0, 1, ..., n-1),
-        deg C(sl_n) = Alt(P_N)(x) / ( n! prod_{i<j} (x_j - x_i) ),
-    where Alt(P_N)(x) is the t^N coefficient of
-        A(t) = sum_{w in S_n} eps(w) prod_{i<j} g(t (x_{w(i)} - x_{w(j)})),   g(u) = 2 - 3u + u^3.
-    Building the permutation by appending elements, the factors contributed by an element b placed
-    after the set S are prod_{a in S} g(t(x_a - x_b)) and the new inversions are #{a in S : a > b},
-    so A(t) = F[{1..n}] where F[{}] = 1 and
-        F[S u {b}] += F[S] * (-1)^{#{a in S : a > b}} * prod_{a in S} g(t (x_a - x_b)).
-    This costs O(2^n n^2) per value of t instead of n!; A(t)/t^N is a polynomial of degree 2N in t,
-    so 2N+1 sample values and Lagrange interpolation give the t^N coefficient.  A_15 takes ~30 s.
-
-Checks built in: root counts, Weyl group orders and closure of each root system; for small Weyl
-groups the orbit sum is recomputed with exact Python integers; in type A the two methods are
-compared for l <= 7; type A values are compared with OEIS A029729 (degrees of the commuting
-variety of n x n matrices, Knutson--Zinn-Justin / Garbali--Zinn-Justin) and G_2 with 1825.
-
-Usage:
-    python3 commuting_degrees.py                      # whole range (~4 min)
-    python3 commuting_degrees.py --tex degrees.tex    # also write a LaTeX longtable
-    python3 commuting_degrees.py --only A12 B4 G2     # selected types only
-    python3 commuting_degrees.py --extra B7 C7 F4     # additional types outside the range
-
-Requires Python >= 3.6 and numpy.
 """
 import sys, time, math, argparse
 from collections import deque
-
-if sys.version_info < (3, 6):
-    sys.exit("This script needs Python 3.6 or newer; run it with python3.")
 
 import numpy as np
 

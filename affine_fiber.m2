@@ -35,7 +35,7 @@ forceGB G;
 J = ideal G;
 
 d = degree J;
-print "dim A_F(c):";
+print "Dimension of A_Fp(c) as an Fp-vector space:";
 print d;
 
 Gdel = groebnerBasis(J + ideal(delta), Strategy => "F4");

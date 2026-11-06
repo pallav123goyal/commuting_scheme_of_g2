@@ -32,7 +32,7 @@ forceGB G;
 I = ideal G;                    
 
 d = dim I;
-print("Dimension of A/(s):");
+print("Dimension of A/(s) as a scheme:");
 print d;
 
 H = reduceHilbert hilbertSeries I;

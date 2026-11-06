@@ -46,8 +46,13 @@ J0 = minimalPresentation(ideal q + ideal ell);
 R0 = ring J0;
 G0 = groebnerBasis(J0, Strategy => "F4"); 
 forceGB G0;
-J0 = ideal G0;                                
+J0 = ideal G0;  
+       
+d = dim J0;
+print("Dimension of A_F3/(l) as a scheme:");
+print d;                       
 hs = reduceHilbert hilbertSeries J0;
+print("Hilbert series:");
 print(hs);
 
 c = {-1,1,0,-1,-1,1,0,1,0,0,1,1,1,1,-1,-1};
@@ -60,6 +65,10 @@ J = ideal G;
 A = R/J;
 B = basis A;                                    
 N = numColumns B;
+
+print("Dimension of A_F3(c) as an F3-vector space:");
+print(N);
+
 Bl = lift(B, R);
 expo = apply(flatten entries Bl, m -> first exponents m);
 pos = hashTable apply(N, j -> expo#j => j);
@@ -89,6 +98,9 @@ for j in sort(toList(0..N-1), j -> sum expo#j) do (
     for i from 0 to N-1 do Frob_(i,j) = cols#j_(i,0));
 
 r = rank Frob;
+print("Rank of Frobenius:");
+print(r);
+
 if(r == N) then print("Frobenius is an isomorphism");
 
 t1 = cpuTime();

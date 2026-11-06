@@ -1,13 +1,11 @@
-"""
 import sys, time, math, argparse
 from collections import deque
 
+if sys.version_info < (3, 6):
+    sys.exit("This script needs Python 3.6 or newer; run it with python3.")
+
 import numpy as np
 
-
-# ----------------------------------------------------------------------------
-# Root systems (Bourbaki simple roots in integer ambient coordinates; E and F scaled by 2)
-# ----------------------------------------------------------------------------
 def simple_roots(typ, l):
     def e(i, n):
         v = [0] * n
@@ -41,7 +39,6 @@ def simple_roots(typ, l):
         return ([a1, a2, a3] + rest)[:l]
     raise ValueError(typ)
 
-
 WEYL_ORDER = {'A': lambda l: math.factorial(l + 1),
               'B': lambda l: 2 ** l * math.factorial(l),
               'C': lambda l: 2 ** l * math.factorial(l),
@@ -58,17 +55,14 @@ DIM_G = {'A': lambda l: l * (l + 2), 'B': lambda l: l * (2 * l + 1), 'C': lambda
 LIE = {'A': lambda l: ('sl', l + 1), 'B': lambda l: ('so', 2 * l + 1), 'C': lambda l: ('sp', 2 * l),
        'D': lambda l: ('so', 2 * l), 'E': lambda l: ('e', l), 'F': lambda l: ('f', 4), 'G': lambda l: ('g', 2)}
 
-
 def dot(u, v):
     return sum(a * b for a, b in zip(u, v))
-
 
 def reflect(v, alpha):
     num, den = 2 * dot(v, alpha), dot(alpha, alpha)
     assert num % den == 0
     c = num // den
     return tuple(x - c * a for x, a in zip(v, alpha))
-
 
 def positive_roots(typ, l):
     S = [tuple(a) for a in simple_roots(typ, l)]
@@ -93,7 +87,6 @@ def positive_roots(typ, l):
     assert 2 * len(pos) == len(roots)
     return pos, S
 
-
 def weyl_orbit(lam, S):
     seen, queue = {tuple(lam)}, deque([tuple(lam)])
     while queue:
@@ -104,7 +97,6 @@ def weyl_orbit(lam, S):
                 seen.add(w)
                 queue.append(w)
     return list(seen)
-
 
 def setup(typ, l):
     pos, S = positive_roots(typ, l)
@@ -118,10 +110,6 @@ def setup(typ, l):
         D *= dot(r, lam)
     return pos, N, orbit, D
 
-
-# ----------------------------------------------------------------------------
-# Modular arithmetic helpers
-# ----------------------------------------------------------------------------
 def is_prime(n):
     small = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
     if n < 2:
@@ -145,7 +133,6 @@ def is_prime(n):
             return False
     return True
 
-
 def primes_below_2_30(k):
     ps, n = [], 2 ** 30 - 1
     while len(ps) < k:
@@ -154,7 +141,6 @@ def primes_below_2_30(k):
         n -= 2
     return ps
 
-
 def crt(residues, primes):
     x, mod = 0, 1
     for r, p in zip(residues, primes):
@@ -162,12 +148,10 @@ def crt(residues, primes):
         mod *= p
     return x
 
-
 def crt_stable(residues, primes):
     full = crt(residues, primes)
     assert full == crt(residues[:-1], primes[:-1]), "CRT unstable: increase the number of primes"
     return full
-
 
 # ----------------------------------------------------------------------------
 # Method 1: orbit sum (any type)
@@ -196,7 +180,6 @@ def exact_orbit_degree(typ, l):
     assert num % den == 0, "the formula did not return an integer"
     return num // den
 
-
 def orbit_sum_mod_p(A, sgn, N, p, chunk=20000):
     total = 0
     for start in range(0, A.shape[0], chunk):
@@ -212,7 +195,6 @@ def orbit_sum_mod_p(A, sgn, N, p, chunk=20000):
             C = new % p
         total = (total + int(np.sum((C[:, N] * sgn[start:start + chunk]) % p) % p)) % p
     return total
-
 
 def orbit_degree(typ, l, nprimes=7):
     pos, N, orbit, D = setup(typ, l)
@@ -230,7 +212,6 @@ def orbit_degree(typ, l, nprimes=7):
     if W <= 5000:
         assert d == exact_orbit_degree(typ, l)
     return d
-
 
 # ----------------------------------------------------------------------------
 # Method 2: subset dynamic programme (type A)
@@ -325,7 +306,6 @@ def write_tex(results, path):
             f.write("$\\mathfrak{%s}_{%d}$ & $%s_{%d}$ & %d & %d & %d & \\seqsplit{%d} \\\\\n" % (
                 name, idx, typ, l, DIM_G[typ](l), NUM_ROOTS[typ](l) // 2, WEYL_ORDER[typ](l), d))
         f.write("\\end{longtable}\\endgroup\n")
-
 
 def main():
     ap = argparse.ArgumentParser(description="degrees of commuting schemes from the root-theoretic formula")

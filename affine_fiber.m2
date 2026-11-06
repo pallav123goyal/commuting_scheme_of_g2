@@ -34,6 +34,9 @@ G = groebnerBasis(I, Strategy => "F4");
 forceGB G;
 J = ideal G;
 
+D = dim J;
+print "Dimension of A_Fp(c) as a scheme:";
+print D;
 d = degree J;
 print "Dimension of A_Fp(c) as an Fp-vector space:";
 print d;

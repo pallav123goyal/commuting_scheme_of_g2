@@ -36,7 +36,8 @@ for prime in primeslist do (
 
 	print prime;
 	d = degree I;
-	if(d <= 1825) then print ("Success") else print ("Not a system of parameters");
+	D = dim I;
+	if(d <= 1825 and  D == 0) then print ("Success") else print ("Not a system of parameters");
 )
 
 t1 = cpuTime();

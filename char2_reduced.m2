@@ -1,6 +1,6 @@
 t0 = cpuTime();
 
-p = 37;
+p = 2;
 kk = ZZ/p;
 
 -- C(gl_2)

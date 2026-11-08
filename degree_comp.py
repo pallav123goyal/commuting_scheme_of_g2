@@ -289,29 +289,10 @@ RANGE = [('A', l) for l in range(1, 16)] + [('B', l) for l in range(2, 7)] + [('
     + [('D', l) for l in range(4, 8)] + [('E', 6), ('G', 2)]
 
 
-def write_tex(results, path):
-    with open(path, 'w') as f:
-        f.write("% needs \\usepackage{longtable,booktabs,seqsplit}\n")
-        f.write("\\begingroup\\renewcommand{\\arraystretch}{1.25}\\setlength{\\tabcolsep}{5pt}\n")
-        f.write("\\begin{longtable}{llrrr>{\\raggedright\\arraybackslash}p{4.9cm}}\n")
-        f.write("\\caption{Degrees of commuting schemes.}\\label{tab:degrees}\\\\\n\\toprule\n")
-        head = "$\\mathfrak g$ & type & $\\dim\\mathfrak g$ & $N$ & $|W|$ & $\\deg\\mathcal C(\\mathfrak g)$ \\\\\n\\midrule\n"
-        f.write(head + "\\endfirsthead\n\\toprule\n" + head + "\\endhead\n\\bottomrule\n\\endlastfoot\n")
-        last = None
-        for typ, l, d in results:
-            if last is not None and typ != last:
-                f.write("\\midrule\n")
-            last = typ
-            name, idx = LIE[typ](l)
-            f.write("$\\mathfrak{%s}_{%d}$ & $%s_{%d}$ & %d & %d & %d & \\seqsplit{%d} \\\\\n" % (
-                name, idx, typ, l, DIM_G[typ](l), NUM_ROOTS[typ](l) // 2, WEYL_ORDER[typ](l), d))
-        f.write("\\end{longtable}\\endgroup\n")
-
 def main():
     ap = argparse.ArgumentParser(description="degrees of commuting schemes from the root-theoretic formula")
     ap.add_argument('--only', nargs='*', default=None, help="compute only these types, e.g. A12 B4 G2")
     ap.add_argument('--extra', nargs='*', default=[], help="additional types, e.g. B7 C7 F4 D8 A16")
-    ap.add_argument('--tex', default=None, help="write the table as a LaTeX longtable to this file")
     args = ap.parse_args()
 
     parse = lambda s: (s[0].upper(), int(s[1:]))
@@ -327,9 +308,6 @@ def main():
         print("%-6s%-8s%7d%5d%18d   %d%s   [%.0fs]" % (typ + str(l), "%s_%d" % (name, idx), DIM_G[typ](l),
               NUM_ROOTS[typ](l) // 2, WEYL_ORDER[typ](l), d, check, time.time() - t0), flush=True)
         results.append((typ, l, d))
-    if args.tex:
-        write_tex(results, args.tex)
-        print("LaTeX table written to", args.tex)
 
 
 if __name__ == '__main__':
